@@ -36,13 +36,31 @@ module = GetParams("module")
 if module == "connect":
     token = GetParams("token")
     option = GetParams("option")
-    bot_rb = telegram.Bot(token=token)
+    try:
+        bot_rb = telegram.Bot(token=token)
+    except Exception as e:
+        print("\x1B[" + "31;40mAn error occurred\x1B[" + "0m")
+        PrintException()
+        raise e
 
-
-if module == "example_view":
-    textarea = GetParams("iframe")
-    print(textarea['input'])
-
-if module == "example_html":
-    textarea = GetParams("iframe")
-    print(textarea['input'])
+if module == "sendMessage":
+    msg = GetParams("msg")
+    chat_id_unfixed = GetParams("chat_id")
+    try:
+        if chat_id_unfixed.find("_") != -1:
+            underscore_index = chat_id_unfixed.find("_")
+            cad_without_underscore = chat_id_unfixed[:underscore_index]
+            removed_prefixed_letter = cad_without_underscore[1:]
+            chat_id = "-100" + removed_prefixed_letter
+        if chat_id_unfixed[0] == "g":
+            chat_id = chat_id_unfixed[1:]
+            chat_id = "-" + chat_id
+        if chat_id_unfixed.find("@") != -1:
+            chat_id = chat_id_unfixed
+        if chat_id_unfixed.isdigit():
+            chat_id = chat_id_unfixed
+        bot_rb.sendMessage(chat_id=chat_id, text=msg)
+    except Exception as e:
+        print("\x1B[" + "31;40mAn error occurred\x1B[" + "0m")
+        PrintException()
+        raise e
