@@ -46,6 +46,9 @@ if module == "connect":
 if module == "sendMessage":
     msg = GetParams("msg")
     chat_id_unfixed = GetParams("chat_id")
+    file_path = GetParams("file")
+    is_img = GetParams("is_img")
+    is_img = str(is_img) == "true" or str(is_img) == "True"
     try:
         if chat_id_unfixed.find("_") != -1:
             underscore_index = chat_id_unfixed.find("_")
@@ -59,7 +62,15 @@ if module == "sendMessage":
             chat_id = chat_id_unfixed
         if chat_id_unfixed.isdigit():
             chat_id = chat_id_unfixed
-        bot_rb.sendMessage(chat_id=chat_id, text=msg)
+        if file_path:
+            caption = msg if msg else None
+            with open(file_path, "rb") as file_to_send:
+                if is_img:
+                    bot_rb.send_photo(chat_id=chat_id, photo=file_to_send, caption=caption)
+                else:
+                    bot_rb.send_document(chat_id=chat_id, document=file_to_send, caption=caption)
+        else:
+            bot_rb.sendMessage(chat_id=chat_id, text=msg)
     except Exception as e:
         print("\x1B[" + "31;40mAn error occurred\x1B[" + "0m")
         PrintException()
